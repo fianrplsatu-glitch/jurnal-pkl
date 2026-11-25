@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getSession } from "@/lib/session";
 
 export type JurnalFormState = {
@@ -122,7 +122,7 @@ export async function createJurnalAction(
     };
   }
 
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await getSupabaseAdmin()
     .from("jurnal")
     .select("id")
     .eq("siswa_id", session.siswaId)
@@ -138,15 +138,17 @@ export async function createJurnalAction(
     };
   }
 
-  const { error: insertError } = await supabaseAdmin.from("jurnal").insert({
-    siswa_id: session.siswaId,
-    tanggal: validation.cleaned.tanggal,
-    kegiatan: validation.cleaned.kegiatan,
-    kompetensi: validation.cleaned.kompetensi,
-    durasi_jam: validation.cleaned.durasi_jam,
-    status: "diajukan",
-    catatan: null,
-  });
+  const { error: insertError } = await getSupabaseAdmin()
+    .from("jurnal")
+    .insert({
+      siswa_id: session.siswaId,
+      tanggal: validation.cleaned.tanggal,
+      kegiatan: validation.cleaned.kegiatan,
+      kompetensi: validation.cleaned.kompetensi,
+      durasi_jam: validation.cleaned.durasi_jam,
+      status: "diajukan",
+      catatan: null,
+    });
 
   if (insertError) {
     if (insertError.code === "23505") {
@@ -184,7 +186,7 @@ export async function updateJurnalAction(
     durasi_jam: String(formData.get("durasi_jam") ?? ""),
   };
 
-  const { data: existingJurnal, error: fetchError } = await supabaseAdmin
+  const { data: existingJurnal, error: fetchError } = await getSupabaseAdmin()
     .from("jurnal")
     .select("id, siswa_id, status")
     .eq("id", jurnalId)
@@ -224,7 +226,7 @@ export async function updateJurnalAction(
     };
   }
 
-  const { data: duplicateDate } = await supabaseAdmin
+  const { data: duplicateDate } = await getSupabaseAdmin()
     .from("jurnal")
     .select("id")
     .eq("siswa_id", session.siswaId)
@@ -240,7 +242,7 @@ export async function updateJurnalAction(
     };
   }
 
-  const { error: updateError } = await supabaseAdmin
+  const { error: updateError } = await getSupabaseAdmin()
     .from("jurnal")
     .update({
       tanggal: validation.cleaned.tanggal,

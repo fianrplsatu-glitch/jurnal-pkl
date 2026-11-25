@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LogOut, Pencil, Plus } from "lucide-react";
 import { getSession } from "@/lib/session";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { logoutAction } from "@/actions/auth";
 
 export const instant = false;
@@ -35,13 +35,13 @@ export default async function JurnalPage() {
     redirect("/masuk");
   }
 
-  const { data: siswa } = await supabaseAdmin
+  const { data: siswa } = await getSupabaseAdmin()
     .from("siswa")
     .select("id, nama, kelas, tempat_pkl, pembimbing")
     .eq("id", session.siswaId)
     .maybeSingle();
 
-  const { data: journals, error } = await supabaseAdmin
+  const { data: journals, error } = await getSupabaseAdmin()
     .from("jurnal")
     .select("id, tanggal, kegiatan, kompetensi, durasi_jam, status, catatan")
     .eq("siswa_id", session.siswaId)

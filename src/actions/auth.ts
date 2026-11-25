@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { createSession, deleteSession } from "@/lib/session";
 
 export type AuthState = {
@@ -20,13 +20,36 @@ export async function loginSiswaAction(
     return { error: "Silakan masukkan kode siswa terlebih dahulu." };
   }
 
+  let supabaseAdmin: ReturnType<typeof getSupabaseAdmin>;
+  try {
+    supabaseAdmin = getSupabaseAdmin();
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.startsWith("Konfigurasi Supabase")
+    ) {
+      return {
+        error:
+          "Konfigurasi database di server belum benar. Admin perlu memperbaiki environment variables Supabase.",
+      };
+    }
+    throw error;
+  }
+
   const { data: siswa, error } = await supabaseAdmin
     .from("siswa")
     .select("id, nama, kode")
     .eq("kode", rawKode)
     .maybeSingle();
 
-  if (error || !siswa) {
+  if (error) {
+    return {
+      error:
+        "Gagal memeriksa kode siswa karena koneksi basis data bermasalah. Hubungi admin.",
+    };
+  }
+
+  if (!siswa) {
     return { error: "Kode siswa tidak ditemukan. Periksa kembali kode Anda." };
   }
 

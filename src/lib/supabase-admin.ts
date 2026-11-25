@@ -1,16 +1,33 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function createSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error(
+      "Konfigurasi Supabase belum lengkap: NEXT_PUBLIC_SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY wajib diatur.",
+    );
+  }
+  if (supabaseServiceKey.startsWith("sb_publishable_")) {
+    throw new Error(
+      "Konfigurasi Supabase salah: SUPABASE_SERVICE_ROLE_KEY memakai publishable key, bukan secret/service-role key.",
+    );
+  }
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error("Variabel lingkungan Supabase belum lengkap.");
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
 }
 
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
+let supabaseAdmin: ReturnType<typeof createSupabaseAdmin> | undefined;
+
+export function getSupabaseAdmin() {
+  if (!supabaseAdmin) {
+    supabaseAdmin = createSupabaseAdmin();
+  }
+  return supabaseAdmin;
+}

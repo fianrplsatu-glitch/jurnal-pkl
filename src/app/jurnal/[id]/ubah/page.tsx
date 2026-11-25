@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { updateJurnalAction } from "@/actions/jurnal";
 import { JurnalForm } from "@/components/JurnalForm";
 
@@ -29,7 +29,7 @@ export default async function UbahJurnalPage({
     notFound();
   }
 
-  const { data: jurnal, error } = await supabaseAdmin
+  const { data: jurnal, error } = await getSupabaseAdmin()
     .from("jurnal")
     .select("id, siswa_id, tanggal, kegiatan, kompetensi, durasi_jam, status")
     .eq("id", jurnalId)

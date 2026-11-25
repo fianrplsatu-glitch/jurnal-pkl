@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { randomBytes } from "crypto";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getSession } from "@/lib/session";
 
 export type AdminActionState = {
@@ -28,7 +28,7 @@ export async function setujuiJurnalAction(
     return { error: "Akses ditolak. Silakan login sebagai admin." };
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from("jurnal")
     .update({ status: "disetujui", catatan: null })
     .eq("id", jurnalId);
@@ -56,7 +56,7 @@ export async function revisiJurnalAction(
     return { error: "Catatan revisi wajib diisi minimal 5 huruf." };
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from("jurnal")
     .update({ status: "revisi", catatan })
     .eq("id", jurnalId);
@@ -95,7 +95,7 @@ export async function tambahSiswaAction(
   let kode = "";
   for (let attempt = 0; attempt < 5; attempt++) {
     const candidate = generateRandomKode();
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await getSupabaseAdmin()
       .from("siswa")
       .select("id")
       .eq("kode", candidate)
@@ -110,7 +110,7 @@ export async function tambahSiswaAction(
     return { error: "Gagal membuat kode unik siswa. Silakan coba lagi." };
   }
 
-  const { error } = await supabaseAdmin.from("siswa").insert({
+  const { error } = await getSupabaseAdmin().from("siswa").insert({
     nama,
     kelas,
     tempat_pkl,
@@ -137,7 +137,7 @@ export async function hapusSiswaAction(
     return { error: "Akses ditolak. Silakan login sebagai admin." };
   }
 
-  const { count, error: countError } = await supabaseAdmin
+  const { count, error: countError } = await getSupabaseAdmin()
     .from("jurnal")
     .select("id", { count: "exact", head: true })
     .eq("siswa_id", siswaId);
@@ -152,7 +152,7 @@ export async function hapusSiswaAction(
     };
   }
 
-  const { error: deleteError } = await supabaseAdmin
+  const { error: deleteError } = await getSupabaseAdmin()
     .from("siswa")
     .delete()
     .eq("id", siswaId);

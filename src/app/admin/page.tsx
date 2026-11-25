@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LogOut, Users } from "lucide-react";
 import { getSession } from "@/lib/session";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { logoutAction } from "@/actions/auth";
 import { AdminJournalActions } from "@/components/AdminJournalActions";
 
@@ -44,12 +44,12 @@ export default async function AdminPage({
   const filterSiswa = resolvedParams.siswa ?? "";
   const filterStatus = resolvedParams.status ?? "";
 
-  const { data: siswaList } = await supabaseAdmin
+  const { data: siswaList } = await getSupabaseAdmin()
     .from("siswa")
     .select("id, nama, kelas, tempat_pkl, pembimbing")
     .order("nama", { ascending: true });
 
-  const { data: allJournals } = await supabaseAdmin
+  const { data: allJournals } = await getSupabaseAdmin()
     .from("jurnal")
     .select(
       "id, siswa_id, tanggal, kegiatan, kompetensi, durasi_jam, status, catatan",

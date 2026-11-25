@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getSession } from "@/lib/session";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { AdminSiswaManager } from "@/components/AdminSiswaManager";
 
 export const instant = false;
@@ -14,12 +14,12 @@ export default async function AdminSiswaPage() {
     redirect("/login");
   }
 
-  const { data: siswaRows } = await supabaseAdmin
+  const { data: siswaRows } = await getSupabaseAdmin()
     .from("siswa")
     .select("id, nama, kelas, tempat_pkl, pembimbing, kode")
     .order("id", { ascending: true });
 
-  const { data: jurnalRows } = await supabaseAdmin
+  const { data: jurnalRows } = await getSupabaseAdmin()
     .from("jurnal")
     .select("siswa_id");
 
