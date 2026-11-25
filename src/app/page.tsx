@@ -2,6 +2,8 @@ import Link from "next/link";
 import { BookOpenCheck, KeyRound, ShieldCheck } from "lucide-react";
 import { getSession } from "@/lib/session";
 
+export const instant = false;
+
 export default async function HomePage() {
   const session = await getSession();
 

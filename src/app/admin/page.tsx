@@ -6,6 +6,8 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { logoutAction } from "@/actions/auth";
 import { AdminJournalActions } from "@/components/AdminJournalActions";
 
+export const instant = false;
+
 function StatusBadge({ status }: { status: string }) {
   if (status === "disetujui") {
     return (

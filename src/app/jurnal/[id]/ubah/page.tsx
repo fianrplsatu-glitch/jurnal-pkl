@@ -4,6 +4,8 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { updateJurnalAction } from "@/actions/jurnal";
 import { JurnalForm } from "@/components/JurnalForm";
 
+export const instant = false;
+
 function formatDateLocal(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");

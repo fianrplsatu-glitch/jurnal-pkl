@@ -5,6 +5,8 @@ import { getSession } from "@/lib/session";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { logoutAction } from "@/actions/auth";
 
+export const instant = false;
+
 function StatusBadge({ status }: { status: string }) {
   if (status === "disetujui") {
     return (

@@ -6,6 +6,8 @@ import { getSession } from "@/lib/session";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { AdminSiswaManager } from "@/components/AdminSiswaManager";
 
+export const instant = false;
+
 export default async function AdminSiswaPage() {
   const session = await getSession();
   if (!session || session.role !== "admin") {
