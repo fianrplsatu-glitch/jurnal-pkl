@@ -44,13 +44,21 @@ export async function loginSiswaAction(
 
   if (error) {
     console.error("Gagal memeriksa kode siswa:", error);
+    const cause =
+      "cause" in error &&
+      error.cause &&
+      typeof error.cause === "object" &&
+      "code" in error.cause &&
+      typeof error.cause.code === "string"
+        ? ` (kode ${error.cause.code})`
+        : "";
     const detail =
       error.code === "42501"
         ? "Akses tabel ditolak."
         : error.code === "42P01"
           ? "Tabel siswa tidak ditemukan."
           : error.message
-            ? `Supabase: ${error.message}`
+            ? `Supabase: ${error.message}${cause}`
             : "Koneksi basis data bermasalah.";
     return {
       error:

@@ -20,10 +20,33 @@ function createSupabaseAdmin() {
     );
   }
 
+  const fetchWithRetry: typeof fetch = async (input, init) => {
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        return await fetch(input, {
+          ...init,
+          signal: AbortSignal.timeout(15000),
+        });
+      } catch (error) {
+        lastError = error;
+        if (attempt < 2) {
+          await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+        }
+      }
+    }
+
+    throw lastError;
+  };
+
   return createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
+    },
+    global: {
+      fetch: fetchWithRetry,
     },
   });
 }
