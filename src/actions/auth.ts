@@ -44,9 +44,17 @@ export async function loginSiswaAction(
 
   if (error) {
     console.error("Gagal memeriksa kode siswa:", error);
+    const detail =
+      error.code === "42501"
+        ? "Akses tabel ditolak."
+        : error.code === "42P01"
+          ? "Tabel siswa tidak ditemukan."
+          : error.message
+            ? `Supabase: ${error.message}`
+            : "Koneksi basis data bermasalah.";
     return {
       error:
-        "Gagal memeriksa kode siswa karena koneksi basis data bermasalah. Hubungi admin.",
+        `Gagal memeriksa kode siswa. ${detail} Periksa environment variables dan deploy terbaru.`,
     };
   }
 
