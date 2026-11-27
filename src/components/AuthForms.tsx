@@ -151,6 +151,9 @@ export function MasukSiswaForm() {
             className="w-full rounded-lg border border-slate-300 px-3.5 py-3 text-sm uppercase outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10"
             placeholder="Contoh: PKL001"
           />
+          <p className="mt-2 text-xs text-slate-500">
+            Masukkan kode persis seperti yang diberikan oleh admin.
+          </p>
         </div>
 
         {state.error ? (

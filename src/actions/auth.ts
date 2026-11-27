@@ -43,6 +43,7 @@ export async function loginSiswaAction(
     .maybeSingle();
 
   if (error) {
+    console.error("Gagal memeriksa kode siswa:", error);
     return {
       error:
         "Gagal memeriksa kode siswa karena koneksi basis data bermasalah. Hubungi admin.",

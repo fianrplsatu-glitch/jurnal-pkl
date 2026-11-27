@@ -92,14 +92,39 @@ export async function tambahSiswaAction(
     return { error: "Kelas, tempat PKL, dan pembimbing wajib diisi." };
   }
 
+  let supabaseAdmin: ReturnType<typeof getSupabaseAdmin>;
+  try {
+    supabaseAdmin = getSupabaseAdmin();
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.startsWith("Konfigurasi Supabase")
+    ) {
+      return {
+        error:
+          "Konfigurasi Supabase server belum benar. Admin perlu mengatur URL dan secret/service-role key di environment variables.",
+      };
+    }
+    throw error;
+  }
+
   let kode = "";
   for (let attempt = 0; attempt < 5; attempt++) {
     const candidate = generateRandomKode();
-    const { data: existing } = await getSupabaseAdmin()
+    const { data: existing, error } = await supabaseAdmin
       .from("siswa")
       .select("id")
       .eq("kode", candidate)
       .maybeSingle();
+
+    if (error) {
+      console.error("Gagal memeriksa keunikan kode siswa:", error);
+      return {
+        error:
+          "Tidak dapat memeriksa kode siswa di database. Periksa konfigurasi Supabase dan izin tabel siswa.",
+      };
+    }
+
     if (!existing) {
       kode = candidate;
       break;
@@ -110,7 +135,7 @@ export async function tambahSiswaAction(
     return { error: "Gagal membuat kode unik siswa. Silakan coba lagi." };
   }
 
-  const { error } = await getSupabaseAdmin().from("siswa").insert({
+  const { error } = await supabaseAdmin.from("siswa").insert({
     nama,
     kelas,
     tempat_pkl,
@@ -119,7 +144,22 @@ export async function tambahSiswaAction(
   });
 
   if (error) {
-    return { error: "Gagal menambahkan data siswa." };
+    console.error("Gagal menambahkan data siswa ke Supabase:", error);
+    if (error.code === "42501") {
+      return {
+        error:
+          "Database menolak penambahan siswa. Periksa service-role key dan izin akses tabel siswa.",
+      };
+    }
+    if (error.code === "23505") {
+      return {
+        error:
+          "Kode siswa bentrok dengan data yang sudah ada. Silakan coba tambah lagi.",
+      };
+    }
+    return {
+      error: `Gagal menambahkan data siswa (${error.code || "database"}). Periksa log server untuk detail.`,
+    };
   }
 
   revalidatePath("/admin");

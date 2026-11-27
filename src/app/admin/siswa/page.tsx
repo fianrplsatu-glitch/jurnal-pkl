@@ -14,14 +14,39 @@ export default async function AdminSiswaPage() {
     redirect("/login");
   }
 
-  const { data: siswaRows } = await getSupabaseAdmin()
-    .from("siswa")
-    .select("id, nama, kelas, tempat_pkl, pembimbing, kode")
-    .order("id", { ascending: true });
+  let siswaRows: Array<{
+    id: number;
+    nama: string;
+    kelas: string;
+    tempat_pkl: string;
+    pembimbing: string;
+    kode: string;
+  }> | null = null;
+  let jurnalRows: Array<{ siswa_id: number }> | null = null;
+  let loadError = "";
 
-  const { data: jurnalRows } = await getSupabaseAdmin()
-    .from("jurnal")
-    .select("siswa_id");
+  try {
+    const siswaResult = await getSupabaseAdmin()
+      .from("siswa")
+      .select("id, nama, kelas, tempat_pkl, pembimbing, kode")
+      .order("id", { ascending: true });
+    if (siswaResult.error) {
+      throw siswaResult.error;
+    }
+    siswaRows = siswaResult.data;
+
+    const jurnalResult = await getSupabaseAdmin()
+      .from("jurnal")
+      .select("siswa_id");
+    if (jurnalResult.error) {
+      throw jurnalResult.error;
+    }
+    jurnalRows = jurnalResult.data;
+  } catch (error) {
+    console.error("Gagal memuat data siswa:", error);
+    loadError =
+      "Data siswa gagal dimuat. Periksa environment variables Supabase dan konfigurasi tabel database.";
+  }
 
   const countMap = new Map<number, number>();
   for (const j of jurnalRows ?? []) {
@@ -54,6 +79,15 @@ export default async function AdminSiswaPage() {
             Kelola Data Siswa PKL
           </h1>
         </div>
+
+        {loadError ? (
+          <div
+            role="alert"
+            className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
+            {loadError}
+          </div>
+        ) : null}
 
         <AdminSiswaManager initialSiswa={formattedSiswa} />
       </div>

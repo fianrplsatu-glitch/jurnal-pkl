@@ -15,3 +15,16 @@ Aplikasi web pencatatan jurnal harian Praktik Kerja Lapangan (PKL) berbasis **Ne
    ```bash
    npm install
    ```
+
+## Deploy ke Vercel
+
+Tambahkan environment variables berikut pada pengaturan **Project Settings > Environment Variables** Vercel:
+
+```text
+NEXT_PUBLIC_SUPABASE_URL=https://PROJECT-REF.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=secret_key_supabase
+ADMIN_PASSWORD=kata_sandi_admin
+SESSION_SECRET=string_random_panjang
+```
+
+Setelah mengubah environment variables, lakukan **Redeploy**. Jangan mengunggah file `.env.local` ke GitHub.
